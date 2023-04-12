@@ -17,7 +17,7 @@ public class Node {
 
     private final Set<MapEntity> links;
 
-    private Integer weight = null;
+    private Integer distance = null;
 
     public MapEntity getMap() {
         return map;
@@ -27,11 +27,11 @@ public class Node {
         return links;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 
-    public Integer getWeight() {
-        return weight;
+    public Integer getDistance() {
+        return distance;
     }
 }

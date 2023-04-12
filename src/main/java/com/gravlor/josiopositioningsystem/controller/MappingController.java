@@ -6,6 +6,7 @@ import com.gravlor.josiopositioningsystem.entity.MapEntity;
 import com.gravlor.josiopositioningsystem.exception.MapNotFoundException;
 import com.gravlor.josiopositioningsystem.service.MapService;
 import com.gravlor.josiopositioningsystem.service.MappingService;
+import com.gravlor.josiopositioningsystem.service.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +32,15 @@ public class MappingController {
         MapEntity mapFrom = mapService.findMapByName(request.getFrom());
         MapEntity mapTo = mapService.findMapByName(request.getTo());
 
-        List<GateEntity> theWay;
+        List<Node> theWay;
         try {
             theWay = mappingService.findTheWay(mapFrom, mapTo);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if (theWay == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(theWay, HttpStatus.OK);

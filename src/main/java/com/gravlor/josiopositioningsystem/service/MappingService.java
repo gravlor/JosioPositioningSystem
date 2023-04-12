@@ -6,12 +6,10 @@ import com.gravlor.josiopositioningsystem.exception.UnknowNodeException;
 import com.gravlor.josiopositioningsystem.service.model.Node;
 import com.gravlor.josiopositioningsystem.service.model.Tree;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,59 +21,71 @@ public class MappingService {
     @Autowired
     private GateService gateService;
 
-    public List<GateEntity> findTheWay(MapEntity from, MapEntity to) throws UnknowNodeException {
+    public List<Node> findTheWay(MapEntity start, MapEntity end) throws UnknowNodeException {
         List<MapEntity> allMaps = mapService.findAllMaps();
         List<GateEntity> allGates = gateService.findAllGates();
 
         Tree tree = buildTree(allMaps, allGates);
-        exploreTree(tree, from, to);
+        exploreTree(tree, start, end);
 
-        return getResult(tree, to);
+        return getResult(tree, start, end);
     }
 
-    private List<GateEntity> getResult(Tree tree, MapEntity to) {
-        //tree.getNode()
+    public @Nullable List<Node> getResult(Tree tree, MapEntity start, MapEntity end) throws UnknowNodeException {
+        Node endNode = tree.getNode(end);
+        if (endNode.getDistance() == null) {
+            return null;
+        }
 
-        return new ArrayList<>();
+        List<Node> path = new ArrayList<>();
+
+        rewindPath(tree, start, endNode, path);
+
+        //Collections.reverse(path);
+        return path;
     }
 
-    private void exploreTree(Tree tree, MapEntity from, MapEntity to) throws UnknowNodeException {
+    private Node rewindPath(Tree tree, MapEntity start, Node end, List<Node> path) throws UnknowNodeException {
+
+        if (end.getMap().getId() == start.getId()) {
+            path.add(end);
+            return end;
+        }
+
+        for (MapEntity link : end.getLinks()) {
+            Node node = tree.getNode(link);
+            if (node.getDistance() != null && (end.getDistance() - 1) == node.getDistance()) {
+                Node nodeFound = rewindPath(tree, start, node, path);
+                if (nodeFound != null) {
+                    path.add(node);
+                    return node;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void exploreTree(Tree tree, MapEntity from, MapEntity to) throws UnknowNodeException {
         Node start = tree.getNode(from);
-        start.setWeight(0);
-
-        //HashSet<Node> nodes = new HashSet<>(tree.getAllNodes());
-
+        start.setDistance(0);
         exploreNode(tree, start, 1);
     }
 
     private void exploreNode(Tree tree, Node exploringNode, int currentDist) throws UnknowNodeException {
 
-        boolean keepExploring = false;
         for (MapEntity map : exploringNode.getLinks()) {
             Node currentNode = tree.getNode(map);
-            if (currentNode.getWeight() != null) {
-                continue;
-            }
-            currentNode.setWeight(currentDist);
-            keepExploring = true;
-        }
-
-        for (MapEntity map : exploringNode.getLinks()) {
-            Node currentNode = tree.getNode(map);
-            if (keepExploring) {
+            if (currentNode.getDistance() == null || currentNode.getDistance() > currentDist) {
+                currentNode.setDistance(currentDist);
                 exploreNode(tree, currentNode, currentDist + 1);
             }
         }
     }
 
-    private void setNodeWeight(Tree tree, Node node, int dist) throws UnknowNodeException {
-
-
-    }
-
-    private Tree buildTree(List<MapEntity> allMaps, List<GateEntity> allGates) {
+    public Tree buildTree(List<MapEntity> allMaps, List<GateEntity> allGates) {
         Tree tree = new Tree();
 
+        //build the tree better starting with starting node and following links ... ? not sure
         allMaps.forEach(map -> tree.addNode(buildNode(map, allGates)));
 
         return tree;
@@ -86,15 +96,9 @@ public class MappingService {
     }
 
     private Set<MapEntity> findLink(MapEntity from, List<GateEntity> allGates) {
-        return allGates.stream().filter(gate ->
-                        from.getName().equals(gate.getFrom().getName()) || from.getName().equals(gate.getTo().getName()))
-                .map(gate -> {
-                    if (from.getName().equals(gate.getFrom().getName())) {
-                        return gate.getTo();
-                    } else {
-                        return gate.getFrom();
-                    }
-                })
+        return allGates.stream()
+                .filter(gate -> from.getId() == gate.getFrom().getId() || from.getId() == gate.getTo().getId())
+                .map(gate -> from.getId() == gate.getFrom().getId() ? gate.getTo() : gate.getFrom())
                 .collect(Collectors.toSet());
     }
 
