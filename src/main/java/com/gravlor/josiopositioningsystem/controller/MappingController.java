@@ -31,7 +31,12 @@ public class MappingController {
         MapEntity mapFrom = mapService.findMapByName(request.getFrom());
         MapEntity mapTo = mapService.findMapByName(request.getTo());
 
-        List<GateEntity> theWay = mappingService.findTheWay(mapFrom, mapTo);
+        List<GateEntity> theWay;
+        try {
+            theWay = mappingService.findTheWay(mapFrom, mapTo);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return new ResponseEntity<>(theWay, HttpStatus.OK);
     }

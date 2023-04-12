@@ -6,6 +6,10 @@ import com.gravlor.josiopositioningsystem.controller.model.AddGateRequest;
 import com.gravlor.josiopositioningsystem.entity.GateEntity;
 import com.gravlor.josiopositioningsystem.entity.MapEntity;
 import com.gravlor.josiopositioningsystem.entity.MapType;
+import com.gravlor.josiopositioningsystem.exception.GateAlreadyExistsException;
+import com.gravlor.josiopositioningsystem.exception.MapAlreadyExistsException;
+import com.gravlor.josiopositioningsystem.exception.MapNotFoundException;
+import com.gravlor.josiopositioningsystem.exception.SameMapForGateException;
 import com.gravlor.josiopositioningsystem.repository.GateRepository;
 import com.gravlor.josiopositioningsystem.repository.MapRepository;
 import com.gravlor.josiopositioningsystem.service.GateService;
@@ -62,5 +66,38 @@ class MappingControllerTest {
         mapRepository.delete(map1);
         mapRepository.delete(map2);
         assert mapRepository.findAll().size() == 0;
+    }
+
+    @Test
+    void testStackOverFlow() throws Exception {
+
+        int nb = 1000;
+
+        createBigLine(nb);
+
+        AddGateRequest addGateRequest = new AddGateRequest("map0", "map" + (nb - 1));
+
+        mvc.perform(post(Constants.PATH_API_MAPPING)
+                        .content(TestsUtils.asJsonString(addGateRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        gateRepository.deleteAll();
+        mapRepository.deleteAll();
+    }
+
+    void createBigLine(int nb) throws MapAlreadyExistsException, MapNotFoundException, GateAlreadyExistsException, SameMapForGateException {
+        int i = 0;
+        while (i < nb) {
+            mapService.createNewMap("map" + i, MapType.BLUE);
+            i++;
+        }
+
+        i = 1;
+        while (i < nb - 1) {
+            gateService.createNewGate("map" + (i - 1), "map" + i);
+            i++;
+        }
     }
 }

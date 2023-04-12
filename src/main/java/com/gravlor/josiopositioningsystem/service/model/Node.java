@@ -2,18 +2,20 @@ package com.gravlor.josiopositioningsystem.service.model;
 
 import com.gravlor.josiopositioningsystem.entity.MapEntity;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
+import java.util.Set;
+
 
 public class Node {
 
-    public Node(MapEntity map, List<MapEntity> links) {
+    public Node(@NotNull MapEntity map, Set<MapEntity> links) {
         this.map = map;
         this.links = links;
     }
 
     private final MapEntity map;
 
-    private final List<MapEntity> links;
+    private final Set<MapEntity> links;
 
     private Integer weight = null;
 
@@ -21,7 +23,7 @@ public class Node {
         return map;
     }
 
-    public List<MapEntity> getLinks() {
+    public Set<MapEntity> getLinks() {
         return links;
     }
 
