@@ -21,7 +21,9 @@ public class GateSerializer extends StdSerializer<GateEntity> {
             jgen.writeStartObject();
             jgen.writeStringField("from", entity.getKey().getFrom().getName());
             jgen.writeStringField("to", entity.getKey().getTo().getName());
-            jgen.writeStringField("until", entity.getUntil().toString());
+            if (entity.getUntil() != null) {
+                jgen.writeStringField("until", entity.getUntil().toString());
+            }
             jgen.writeEndObject();
         }
 }

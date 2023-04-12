@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -65,5 +66,9 @@ public class GateService {
         GateEntity gateEntity = new GateEntity(optMapFrom.get(), optMapTo.get(), until);
         gateEntity = gateRepository.save(gateEntity);
         return gateEntity;
+    }
+
+    public List<GateEntity> findAllGates() {
+        return gateRepository.findAll();
     }
 }

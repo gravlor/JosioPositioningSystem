@@ -6,7 +6,9 @@ import javax.validation.constraints.*;
 
 public class AddAvalonGateRequest extends AddGateRequest {
 
-    public AddAvalonGateRequest() {}
+    public AddAvalonGateRequest() {
+        super();
+    }
 
     public AddAvalonGateRequest(String from, String to, int hoursLeft, int minutesLeft) {
         super(from, to);

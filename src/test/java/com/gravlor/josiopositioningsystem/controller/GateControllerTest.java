@@ -3,7 +3,7 @@ package com.gravlor.josiopositioningsystem.controller;
 import com.gravlor.josiopositioningsystem.TestsUtils;
 import com.gravlor.josiopositioningsystem.config.JosioPositioningSystemApplication;
 import com.gravlor.josiopositioningsystem.controller.model.AddAvalonGateRequest;
-import com.gravlor.josiopositioningsystem.controller.model.GateCreatedResponse;
+import com.gravlor.josiopositioningsystem.controller.model.AddGateRequest;
 import com.gravlor.josiopositioningsystem.entity.GateEntity;
 import com.gravlor.josiopositioningsystem.entity.GateKey;
 import com.gravlor.josiopositioningsystem.entity.MapEntity;
@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Optional;
 
@@ -139,7 +138,6 @@ class GateControllerTest {
         assert "map1".equals(gateEntity.getKey().getFrom().getName());
         assert "map2".equals(gateEntity.getKey().getTo().getName());
 
-        // clear DB
         gateRepository.delete(gateEntity);
         assert gateRepository.findAll().size() == 0;
 
@@ -221,5 +219,36 @@ class GateControllerTest {
         assert mapRepository.findAll().size() == 0;
     }
 
+    @Test
+    void testAddGate() throws Exception {
+        MapEntity map1 = new MapEntity("map1", MapType.BLUE);
+        MapEntity map2 = new MapEntity("map2", MapType.BLUE);
+        mapRepository.save(map1);
+        mapRepository.save(map2);
 
+        AddGateRequest addGateRequest = new AddGateRequest("map1", "map2");
+
+        mvc.perform(post(Constants.PATH_API_GATE)
+                        .content(TestsUtils.asJsonString(addGateRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        Optional<GateEntity> optGateEntity = gateRepository.findById(new GateKey(map1, map2));
+        if (optGateEntity.isEmpty()) {
+            fail();
+        }
+
+        GateEntity gateEntity = optGateEntity.get();
+
+        assert "map1".equals(gateEntity.getKey().getFrom().getName());
+        assert "map2".equals(gateEntity.getKey().getTo().getName());
+
+        gateRepository.delete(gateEntity);
+        assert gateRepository.findAll().size() == 0;
+
+        mapRepository.delete(map1);
+        mapRepository.delete(map2);
+        assert mapRepository.findAll().size() == 0;
+    }
 }

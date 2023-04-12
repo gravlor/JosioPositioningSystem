@@ -9,4 +9,6 @@ public class Constants {
 
     public static final String PATH_API_GATE_AVALON = PATH_API_GATE + "/avalon";
 
+    public static final String PATH_API_MAPPING = "/api/mapping";
+
 }

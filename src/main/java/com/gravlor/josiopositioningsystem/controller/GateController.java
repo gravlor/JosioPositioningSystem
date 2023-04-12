@@ -8,7 +8,6 @@ import com.gravlor.josiopositioningsystem.exception.GateInvalidDurationException
 import com.gravlor.josiopositioningsystem.exception.SameMapForGateException;
 import com.gravlor.josiopositioningsystem.exception.MapNotFoundException;
 import com.gravlor.josiopositioningsystem.service.GateService;
-import com.gravlor.josiopositioningsystem.service.MapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +24,6 @@ public class GateController {
 
     @Autowired
     private GateService gateService;
-
-    @Autowired
-    private MapService mapService;
 
     @PostMapping(Constants.PATH_API_GATE_AVALON)
     public ResponseEntity<GateEntity> addAvalonGate(@Valid @RequestBody AddAvalonGateRequest request)
@@ -50,14 +46,13 @@ public class GateController {
     }
 
     @PostMapping(Constants.PATH_API_GATE)
-    public ResponseEntity<GateEntity> addGateStatic(@Valid @RequestBody AddGateRequest request)
+    public ResponseEntity<GateEntity> addGate(@Valid @RequestBody AddGateRequest request)
             throws MapNotFoundException, SameMapForGateException, GateAlreadyExistsException {
 
         String nameMapFrom = request.getFrom();
         String nameMapTo = request.getTo();
 
         GateEntity gateEntity = gateService.createNewGate(nameMapFrom, nameMapTo);
-
         return new ResponseEntity<>(gateEntity, HttpStatus.CREATED);
     }
 }

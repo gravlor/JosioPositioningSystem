@@ -1,14 +1,27 @@
 package com.gravlor.josiopositioningsystem.controller.model;
 
-import com.gravlor.josiopositioningsystem.entity.MapType;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 
-public class AddAvalonMapRequest extends AddMapRequest {
+public class AddAvalonMapRequest {
 
     public AddAvalonMapRequest() {}
 
     public AddAvalonMapRequest(String name) {
-        super(name, MapType.AVALON.name());
+       this.name = name;
+    }
+
+    @NotBlank(message = "Name must not be empty")
+    @Pattern(regexp="^[A-Za-z\\-\\ ]*$", message = "Name contains invalid characters")
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }
