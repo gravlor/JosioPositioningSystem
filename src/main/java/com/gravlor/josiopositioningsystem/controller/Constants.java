@@ -2,8 +2,11 @@ package com.gravlor.josiopositioningsystem.controller;
 
 public class Constants {
 
-    public static final String PATH_API_MAP = "/api/map";
+    public static final String PATH_API_MAP = "/api/maps";
 
-    public static final String PATH_API_MAP_STATIC = PATH_API_MAP + "/static";
-    public static final String PATH_API_GATE = "/api/gate";
+    public static final String PATH_API_MAP_AVALON = PATH_API_MAP + "/avalon";
+    public static final String PATH_API_GATE = "/api/gates";
+
+    public static final String PATH_API_GATE_AVALON = PATH_API_GATE + "/avalon";
+
 }

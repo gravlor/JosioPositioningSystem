@@ -1,26 +1,14 @@
 package com.gravlor.josiopositioningsystem.controller.model;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import com.gravlor.josiopositioningsystem.entity.MapType;
 
-public class AddAvalonMapRequest {
+
+public class AddAvalonMapRequest extends AddMapRequest {
 
     public AddAvalonMapRequest() {}
 
     public AddAvalonMapRequest(String name) {
-        this.name = name;
+        super(name, MapType.AVALON.name());
     }
 
-    @NotNull
-    @Pattern(regexp="^[A-Za-z\\-\\ ]*$", message = "Invalid Input")
-    private String name;
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

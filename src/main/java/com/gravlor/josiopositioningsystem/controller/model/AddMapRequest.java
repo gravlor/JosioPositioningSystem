@@ -1,17 +1,20 @@
 package com.gravlor.josiopositioningsystem.controller.model;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
-public class AddStaticMapRequest {
+public class AddMapRequest {
 
-    public AddStaticMapRequest() {}
+    public AddMapRequest() {}
 
-    public AddStaticMapRequest(String name, String type) {
+    public AddMapRequest(String name, String type) {
         this.name = name;
         this.type = type;
     }
 
-    @NotNull
+    @NotBlank(message = "Name must not be empty")
+    @Pattern(regexp="^[A-Za-z\\-\\ ]*$", message = "Name contains invalid characters")
     private String name;
 
     @NotNull

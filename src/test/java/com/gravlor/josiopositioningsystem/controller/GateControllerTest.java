@@ -2,7 +2,7 @@ package com.gravlor.josiopositioningsystem.controller;
 
 import com.gravlor.josiopositioningsystem.TestsUtils;
 import com.gravlor.josiopositioningsystem.config.JosioPositioningSystemApplication;
-import com.gravlor.josiopositioningsystem.controller.model.AddGateRequest;
+import com.gravlor.josiopositioningsystem.controller.model.AddAvalonGateRequest;
 import com.gravlor.josiopositioningsystem.controller.model.GateCreatedResponse;
 import com.gravlor.josiopositioningsystem.entity.GateEntity;
 import com.gravlor.josiopositioningsystem.entity.GateKey;
@@ -42,10 +42,10 @@ class GateControllerTest {
     private GateRepository gateRepository;
 
     @Test
-    void testAddGateFromErrorValues() throws Exception {
-        AddGateRequest addGateRequest = new AddGateRequest(null, "test", 1, 0);
+    void testAddAvalonGateFromErrorValues() throws Exception {
+        AddAvalonGateRequest addGateRequest = new AddAvalonGateRequest(null, "test", 1, 0);
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -53,7 +53,7 @@ class GateControllerTest {
                 .andExpect(jsonPath("$.messages", Matchers.contains("Error for field 'from' : Value must not be null")));
 
         addGateRequest.setFrom("yolo");
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -62,10 +62,10 @@ class GateControllerTest {
     }
 
     @Test
-    void testAddGateToErrorValues() throws Exception {
-        AddGateRequest addGateRequest = new AddGateRequest("test", null, 1, 0);
+    void testAddAvalonGateToErrorValues() throws Exception {
+        AddAvalonGateRequest addGateRequest = new AddAvalonGateRequest("test", null, 1, 0);
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -74,10 +74,10 @@ class GateControllerTest {
     }
 
     @Test
-    void testAddGateHoursLeftNotValid() throws Exception {
-        AddGateRequest addGateRequest = new AddGateRequest("map1", "map2", -1, 0);
+    void testAddAvalonGateHoursLeftNotValid() throws Exception {
+        AddAvalonGateRequest addGateRequest = new AddAvalonGateRequest("map1", "map2", -1, 0);
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -86,10 +86,10 @@ class GateControllerTest {
     }
 
     @Test
-    void testAddGateMinutesLeftNotValid() throws Exception {
-        AddGateRequest addGateRequest = new AddGateRequest("map1", "map2", 1, 60);
+    void testAddAvalonGateMinutesLeftNotValid() throws Exception {
+        AddAvalonGateRequest addGateRequest = new AddAvalonGateRequest("map1", "map2", 1, 60);
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -98,7 +98,7 @@ class GateControllerTest {
 
         addGateRequest.setMinutesLeft(-1);
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -107,16 +107,15 @@ class GateControllerTest {
     }
 
     @Test
-    void testAddGate() throws Exception {
-
+    void testAddAvalonGate() throws Exception {
         MapEntity map1 = new MapEntity("map1", MapType.BLUE);
         MapEntity map2 = new MapEntity("map2", MapType.BLUE);
         mapRepository.save(map1);
         mapRepository.save(map2);
 
-        AddGateRequest addGateRequest = new AddGateRequest("map1", "map2", 0, 0);
+        AddAvalonGateRequest addGateRequest = new AddAvalonGateRequest("map1", "map2", 0, 0);
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -124,30 +123,24 @@ class GateControllerTest {
                 .andExpect(jsonPath("$.messages", Matchers.contains("Duration is not valid")));
 
         addGateRequest.setHoursLeft(1);
-        MvcResult mvcResult = mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        GateCreatedResponse objectCreated = TestsUtils.convertJsonToObject(mvcResult.getResponse().getContentAsString(), GateCreatedResponse.class);
-
-        if (objectCreated == null) {
-            fail();
-        }
-
-        assert "map1".equals(objectCreated.getFrom());
-        assert "map2".equals(objectCreated.getTo());
-
-        // clear DB
+                .andExpect(status().isCreated());
 
         Optional<GateEntity> optGateEntity = gateRepository.findById(new GateKey(map1, map2));
         if (optGateEntity.isEmpty()) {
             fail();
         }
 
-        gateRepository.delete(optGateEntity.get());
+        GateEntity gateEntity = optGateEntity.get();
+
+        assert "map1".equals(gateEntity.getKey().getFrom().getName());
+        assert "map2".equals(gateEntity.getKey().getTo().getName());
+
+        // clear DB
+        gateRepository.delete(gateEntity);
         assert gateRepository.findAll().size() == 0;
 
         mapRepository.delete(map1);
@@ -156,22 +149,54 @@ class GateControllerTest {
     }
 
     @Test
-    void testAddDuplicateGate() throws Exception {
-
+    void testAddAvalonGateNumValues() throws Exception {
         MapEntity map1 = new MapEntity("map1", MapType.BLUE);
         MapEntity map2 = new MapEntity("map2", MapType.BLUE);
         mapRepository.save(map1);
         mapRepository.save(map2);
 
-        AddGateRequest addGateRequest = new AddGateRequest("map1", "map2", 1, 0);
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
+                        .content(getAddAvalonGateNumValuesRequest())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages", Matchers.contains("Invalid request body")));
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mapRepository.delete(map1);
+        mapRepository.delete(map2);
+        assert mapRepository.findAll().size() == 0;
+    }
+
+    private String getAddAvalonGateNumValuesRequest() {
+        return "{" +
+                "    \"from\" : \"map1\"," +
+                "    \"to\" : \"map2\"," +
+                "    \"hoursLeft\" : 1.5," +
+                "    \"minutesLeft\" : 0" +
+                "}";
+    }
+
+    @Test
+    void testAddAvalonGateDuplicate() throws Exception {
+        MapEntity map1 = new MapEntity("map1", MapType.BLUE);
+        MapEntity map2 = new MapEntity("map2", MapType.BLUE);
+        mapRepository.save(map1);
+        mapRepository.save(map2);
+
+        AddAvalonGateRequest addGateRequest = new AddAvalonGateRequest("map1", "map2", 1, 0);
+
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        Optional<GateEntity> gateCreated = gateRepository.findById(new GateKey(map1, map2));
+        if (gateCreated.isEmpty()) {
+            fail();
+        }
+
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -181,11 +206,20 @@ class GateControllerTest {
         addGateRequest.setFrom("map2");
         addGateRequest.setTo("map1");
 
-        mvc.perform(post(Constants.PATH_API_GATE)
+        mvc.perform(post(Constants.PATH_API_GATE_AVALON)
                         .content(TestsUtils.asJsonString(addGateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.messages", Matchers.contains("A gate already exists from 'map2' to 'map1'")));
+
+        gateRepository.delete(gateCreated.get());
+        assert gateRepository.findAll().size() == 0;
+
+        mapRepository.delete(map1);
+        mapRepository.delete(map2);
+        assert mapRepository.findAll().size() == 0;
     }
+
+
 }
