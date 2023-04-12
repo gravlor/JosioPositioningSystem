@@ -1,5 +1,6 @@
 package com.gravlor.josiopositioningsystem.controller;
 
+import com.gravlor.josiopositioningsystem.controller.model.AddAvalonMapRequest;
 import com.gravlor.josiopositioningsystem.controller.model.AddStaticMapRequest;
 import com.gravlor.josiopositioningsystem.entity.MapEntity;
 import com.gravlor.josiopositioningsystem.entity.MapType;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +25,8 @@ public class MapController {
     private MapRepository mapRepository;
 
     @PostMapping(Constants.PATH_API_MAP)
-    public ResponseEntity<MapEntity> addAvalonMap(@RequestBody String name) throws MapAlreadyExistsException {
+    public ResponseEntity<MapEntity> addAvalonMap(@Valid @RequestBody AddAvalonMapRequest request) throws MapAlreadyExistsException {
+        String name = request.getName();
         Optional<MapEntity> optMap = mapRepository.findByName(name);
         if (optMap.isPresent()) {
             throw new MapAlreadyExistsException(name);

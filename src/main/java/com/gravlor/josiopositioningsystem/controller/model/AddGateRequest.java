@@ -1,43 +1,45 @@
 package com.gravlor.josiopositioningsystem.controller.model;
 
+import org.hibernate.validator.constraints.Range;
+
 import javax.validation.constraints.*;
 
 public class AddGateRequest {
 
     public AddGateRequest() {}
 
-    public AddGateRequest(String map1, String map2, int hoursLeft, int minutesLeft) {
-        this.map1 = map1;
-        this.map2 = map2;
+    public AddGateRequest(String from, String to, int hoursLeft, int minutesLeft) {
+        this.from = from;
+        this.to = to;
         this.hoursLeft = hoursLeft;
         this.minutesLeft = minutesLeft;
     }
 
-    @NotNull
-    private String map1;
-    @NotNull
-    private String map2;
+    @NotNull(message = "Value must not be null")
+    private String from;
+    @NotNull(message = "Value must not be null")
+    private String to;
 
-    @Min(value = 0, message = "The value must be positive")
+    @Min(value = 0, message = "Value must be positive")
     private int hoursLeft;
 
-    @Min(value = 0, message = "The value must be positive")
+    @Range(min = 0, max = 59, message = "Value must be between 0 and 59")
     private int minutesLeft;
 
-    public String getMap1() {
-        return map1;
+    public String getFrom() {
+        return from;
     }
 
-    public void setMap1(String map1) {
-        this.map1 = map1;
+    public void setFrom(String from) {
+        this.from = from;
     }
 
-    public String getMap2() {
-        return map2;
+    public String getTo() {
+        return to;
     }
 
-    public void setMap2(String map2) {
-        this.map2 = map2;
+    public void setTo(String to) {
+        this.to = to;
     }
 
     public int getHoursLeft() {

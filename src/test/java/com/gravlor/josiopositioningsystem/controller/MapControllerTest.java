@@ -1,6 +1,7 @@
 package com.gravlor.josiopositioningsystem.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gravlor.josiopositioningsystem.TestsUtils;
 import com.gravlor.josiopositioningsystem.config.JosioPositioningSystemApplication;
 import com.gravlor.josiopositioningsystem.controller.model.AddStaticMapRequest;
 import com.gravlor.josiopositioningsystem.entity.MapEntity;
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = JosioPositioningSystemApplication.class)
 @AutoConfigureMockMvc
-public class MapControllerTest {
+class MapControllerTest {
 
 
     @Autowired
@@ -33,14 +34,6 @@ public class MapControllerTest {
 
     @Autowired
     private MapRepository mapRepository;
-
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Test
     void testAddAvalonMap() throws Exception {
@@ -67,7 +60,7 @@ public class MapControllerTest {
     void testAddStaticMap() throws Exception {
 
         mvc.perform(post(Constants.PATH_API_MAP_STATIC)
-                        .content(asJsonString(new AddStaticMapRequest("static", MapType.BLUE.name())))
+                        .content(TestsUtils.asJsonString(new AddStaticMapRequest("static", MapType.BLUE.name())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -78,7 +71,7 @@ public class MapControllerTest {
         }
 
         mvc.perform(post(Constants.PATH_API_MAP_STATIC)
-                        .content(asJsonString(new AddStaticMapRequest("static", MapType.BLUE.name())))
+                        .content(TestsUtils.asJsonString(new AddStaticMapRequest("static", MapType.BLUE.name())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -97,4 +90,5 @@ public class MapControllerTest {
         List<MapEntity> allMaps = mapRepository.findAll();
         assert allMaps.size()  > 0;
     }
+    // add test map name
 }
