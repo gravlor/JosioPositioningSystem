@@ -3,6 +3,7 @@ package com.gravlor.josiopositioningsystem.controller;
 import com.gravlor.josiopositioningsystem.TestsUtils;
 import com.gravlor.josiopositioningsystem.config.JosioPositioningSystemApplication;
 import com.gravlor.josiopositioningsystem.controller.model.AddGateRequest;
+import com.gravlor.josiopositioningsystem.entity.GateEntity;
 import com.gravlor.josiopositioningsystem.entity.MapEntity;
 import com.gravlor.josiopositioningsystem.entity.MapType;
 import com.gravlor.josiopositioningsystem.repository.GateRepository;
@@ -43,9 +44,9 @@ class MappingControllerTest {
     @Test
     void basicTestMapping() throws Exception {
 
-        mapService.createNewMap("map1", MapType.BLUE);
-        mapService.createNewMap("map2", MapType.BLUE);
-        gateService.createNewGate("map1", "map2");
+        MapEntity map1 = mapService.createNewMap("map1", MapType.BLUE);
+        MapEntity map2 = mapService.createNewMap("map2", MapType.BLUE);
+        GateEntity gate = gateService.createNewGate("map1", "map2");
 
         AddGateRequest addGateRequest = new AddGateRequest("map1", "map2");
 
@@ -54,5 +55,12 @@ class MappingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+
+        gateRepository.delete(gate);
+        assert gateRepository.findAll().size() == 0;
+
+        mapRepository.delete(map1);
+        mapRepository.delete(map2);
+        assert mapRepository.findAll().size() == 0;
     }
 }

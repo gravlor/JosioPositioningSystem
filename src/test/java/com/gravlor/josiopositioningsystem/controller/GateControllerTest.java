@@ -5,7 +5,6 @@ import com.gravlor.josiopositioningsystem.config.JosioPositioningSystemApplicati
 import com.gravlor.josiopositioningsystem.controller.model.AddAvalonGateRequest;
 import com.gravlor.josiopositioningsystem.controller.model.AddGateRequest;
 import com.gravlor.josiopositioningsystem.entity.GateEntity;
-import com.gravlor.josiopositioningsystem.entity.GateKey;
 import com.gravlor.josiopositioningsystem.entity.MapEntity;
 import com.gravlor.josiopositioningsystem.entity.MapType;
 import com.gravlor.josiopositioningsystem.repository.GateRepository;
@@ -128,15 +127,15 @@ class GateControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        Optional<GateEntity> optGateEntity = gateRepository.findById(new GateKey(map1, map2));
+        Optional<GateEntity> optGateEntity = gateRepository.findByFromNameAndToName(map1.getName(), map2.getName());
         if (optGateEntity.isEmpty()) {
             fail();
         }
 
         GateEntity gateEntity = optGateEntity.get();
 
-        assert "map1".equals(gateEntity.getKey().getFrom().getName());
-        assert "map2".equals(gateEntity.getKey().getTo().getName());
+        assert "map1".equals(gateEntity.getFrom().getName());
+        assert "map2".equals(gateEntity.getTo().getName());
 
         gateRepository.delete(gateEntity);
         assert gateRepository.findAll().size() == 0;
@@ -189,7 +188,7 @@ class GateControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        Optional<GateEntity> gateCreated = gateRepository.findById(new GateKey(map1, map2));
+        Optional<GateEntity> gateCreated = gateRepository.findByFromNameAndToName(map1.getName(), map2.getName());
         if (gateCreated.isEmpty()) {
             fail();
         }
@@ -234,15 +233,15 @@ class GateControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        Optional<GateEntity> optGateEntity = gateRepository.findById(new GateKey(map1, map2));
+        Optional<GateEntity> optGateEntity = gateRepository.findByFromNameAndToName(map1.getName(), map2.getName());
         if (optGateEntity.isEmpty()) {
             fail();
         }
 
         GateEntity gateEntity = optGateEntity.get();
 
-        assert "map1".equals(gateEntity.getKey().getFrom().getName());
-        assert "map2".equals(gateEntity.getKey().getTo().getName());
+        assert "map1".equals(gateEntity.getFrom().getName());
+        assert "map2".equals(gateEntity.getTo().getName());
 
         gateRepository.delete(gateEntity);
         assert gateRepository.findAll().size() == 0;

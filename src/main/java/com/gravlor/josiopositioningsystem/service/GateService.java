@@ -1,7 +1,6 @@
 package com.gravlor.josiopositioningsystem.service;
 
 import com.gravlor.josiopositioningsystem.entity.GateEntity;
-import com.gravlor.josiopositioningsystem.entity.GateKey;
 import com.gravlor.josiopositioningsystem.entity.MapEntity;
 import com.gravlor.josiopositioningsystem.exception.GateAlreadyExistsException;
 import com.gravlor.josiopositioningsystem.exception.SameMapForGateException;
@@ -24,19 +23,8 @@ public class GateService {
     @Autowired
     private MapRepository mapRepository;
 
-    public boolean checkGateExists(String nameMapFrom, String nameMapTo) throws MapNotFoundException {
-
-        Optional<MapEntity> optMapFrom = mapRepository.findByName(nameMapFrom);
-        if (optMapFrom.isEmpty()) {
-            throw new MapNotFoundException(nameMapFrom);
-        }
-
-        Optional<MapEntity> optMapTo = mapRepository.findByName(nameMapTo);
-        if (optMapTo.isEmpty()) {
-            throw new MapNotFoundException(nameMapTo);
-        }
-
-        return gateRepository.existsById(new GateKey(optMapFrom.get(), optMapTo.get())) || gateRepository.existsById(new GateKey(optMapTo.get(), optMapFrom.get()));
+    public boolean checkGateExists(MapEntity mapFrom, MapEntity mapTo) {
+        return gateRepository.existsByFromNameAndToName(mapFrom.getName(), mapTo.getName()) || gateRepository.existsByFromNameAndToName(mapTo.getName(), mapFrom.getName());
     }
 
     public GateEntity createNewGate(String nameMapFrom, String nameMapTo) throws MapNotFoundException, SameMapForGateException, GateAlreadyExistsException {
@@ -59,7 +47,7 @@ public class GateService {
             throw new MapNotFoundException(nameMapTo);
         }
 
-        if (checkGateExists(nameMapFrom, nameMapTo)) {
+        if (checkGateExists(optMapFrom.get(), optMapTo.get())) {
             throw new GateAlreadyExistsException(nameMapFrom, nameMapTo);
         }
 

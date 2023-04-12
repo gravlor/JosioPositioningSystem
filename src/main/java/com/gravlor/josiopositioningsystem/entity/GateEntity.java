@@ -13,21 +13,44 @@ public class GateEntity {
     public GateEntity() {}
 
     public GateEntity(MapEntity from, MapEntity to, Date until) {
-        this.key = new GateKey(from, to);
+        this.from = from;
+        this.to = to;
         this.until = until;
     }
 
-    @EmbeddedId
-    private GateKey key;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    private MapEntity from;
+
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    private MapEntity to;
 
     private Date until;
 
-    public GateKey getKey() {
-        return key;
+    public Integer getId() {
+        return id;
     }
 
-    public void setKey(GateKey key) {
-        this.key = key;
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public MapEntity getFrom() {
+        return from;
+    }
+    public void setFrom(MapEntity from) {
+        this.from = from;
+    }
+
+    public MapEntity getTo() {
+        return to;
+    }
+
+    public void setTo(MapEntity to) {
+        this.to = to;
     }
 
     public Date getUntil() {

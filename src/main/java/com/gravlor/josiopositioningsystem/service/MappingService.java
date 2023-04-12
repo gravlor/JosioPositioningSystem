@@ -22,18 +22,18 @@ public class MappingService {
         List<MapEntity> allMaps = mapService.findAllMaps();
         List<GateEntity> allGates = gateService.findAllGates();
 
-        
+
 
         return new ArrayList<>();
     }
 
-    private void explore(MapEntity from, MapEntity to, List<MapEntity> allMaps, List<GateEntity> allGates) {
+    private void buildGlobalMap(List<MapEntity> allMaps, List<GateEntity> allGates) {
 
     }
 
     private List<GateEntity> findLink(MapEntity from, List<GateEntity> allGates) {
         return allGates.stream().filter(gate ->
-                from.getName().equals(gate.getKey().getFrom().getName()) || from.getName().equals(gate.getKey().getTo().getName()))
+                from.getName().equals(gate.getFrom().getName()) || from.getName().equals(gate.getTo().getName()))
                 .collect(Collectors.toList());
     }
 

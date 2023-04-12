@@ -19,8 +19,8 @@ public class GateSerializer extends StdSerializer<GateEntity> {
         @Override
         public void serialize(GateEntity entity, JsonGenerator jgen, SerializerProvider provider) throws IOException {
             jgen.writeStartObject();
-            jgen.writeStringField("from", entity.getKey().getFrom().getName());
-            jgen.writeStringField("to", entity.getKey().getTo().getName());
+            jgen.writeStringField("from", entity.getFrom().getName());
+            jgen.writeStringField("to", entity.getTo().getName());
             if (entity.getUntil() != null) {
                 jgen.writeStringField("until", entity.getUntil().toString());
             }

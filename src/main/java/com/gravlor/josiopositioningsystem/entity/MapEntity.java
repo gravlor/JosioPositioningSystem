@@ -1,6 +1,7 @@
 package com.gravlor.josiopositioningsystem.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "maps")
@@ -44,4 +45,17 @@ public class MapEntity {
     public void setType(MapType type) {
         this.type = type;
     }
+
+    /*
+    @OneToMany
+    private List<GateEntity> links;
+
+    public List<GateEntity> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<GateEntity> links) {
+        this.links = links;
+    }
+     */
 }
